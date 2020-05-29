@@ -39,17 +39,26 @@ public class CUDShoppingTrolleyServlet extends HttpServlet {
 
                 String submitType = req.getParameter("submitType");
                 ShoppingTrolley oldShoppingTrolley = shoppingTrolleyDAO.queryByItemId(itemId,username);
-                if ("add".equals(submitType)){ //通过add一个一个添加商品数量至购物车
+                if ("add".equals(submitType)||"addMore".equals(submitType)){ //通过add一个一个添加商品数量至购物车
+                    Integer itemNum = Integer.parseInt(req.getParameter("itemNum"));
                     if (oldShoppingTrolley==null){
                         ShoppingTrolley newShoppingTrolley = new ShoppingTrolley();
                         newShoppingTrolley.setItem_id(itemId);
                         newShoppingTrolley.setItem_name(itemDAO.queryByItemId(itemId).getName());
                         newShoppingTrolley.setItem_singlePrice(itemDAO.queryByItemId(itemId).getPrice());
-                        newShoppingTrolley.setItem_num(1);
+                        if("add".equals(submitType)){
+                            newShoppingTrolley.setItem_num(1);
+                        }else {
+                            newShoppingTrolley.setItem_num(itemNum);
+                        }
                         newShoppingTrolley.setUsername(username);
                         shoppingTrolleyDAO.add(newShoppingTrolley);
                     }else {
-                        oldShoppingTrolley.setItem_num(oldShoppingTrolley.getItem_num()+1);
+                        if("add".equals(submitType)){
+                            oldShoppingTrolley.setItem_num(oldShoppingTrolley.getItem_num()+1);
+                        }else {
+                            oldShoppingTrolley.setItem_num(itemNum);
+                        }
                         shoppingTrolleyDAO.update(oldShoppingTrolley);
                     }
 
@@ -57,7 +66,7 @@ public class CUDShoppingTrolleyServlet extends HttpServlet {
                 }else if ("update".equals(submitType)){ //直接修改购物车数量
                     req.getSession().setAttribute("shoppingTrolley",oldShoppingTrolley);
                     req.getRequestDispatcher("shoppingTrolley/item.jsp").forward(req, resp);
-                }else if ("confirmUpdate".equals(submitType)||"addMore".equals(submitType)){
+                }else if ("confirmUpdate".equals(submitType)){
                     Integer itemNum = Integer.parseInt(req.getParameter("itemNum"));
                     oldShoppingTrolley.setItem_num(itemNum);
                     shoppingTrolleyDAO.update(oldShoppingTrolley);

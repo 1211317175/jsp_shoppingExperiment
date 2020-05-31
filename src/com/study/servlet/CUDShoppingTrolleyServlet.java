@@ -39,8 +39,13 @@ public class CUDShoppingTrolleyServlet extends HttpServlet {
 
                 String submitType = req.getParameter("submitType");
                 ShoppingTrolley oldShoppingTrolley = shoppingTrolleyDAO.queryByItemId(itemId,username);
-                if ("add".equals(submitType)||"addMore".equals(submitType)){ //通过add一个一个添加商品数量至购物车
-                    Integer itemNum = Integer.parseInt(req.getParameter("itemNum"));
+                if ("add".equals(submitType)||"addMore".equals(submitType)){
+                    //add代表一个一个添加商品
+                    //addMore则是根据获取的商品数进行直接添加（允许一个或多个）
+                    Integer itemNum = 1;
+                    if("addMore".equals(submitType)){
+                        itemNum = Integer.parseInt(req.getParameter("itemNum"));
+                    }
                     if (oldShoppingTrolley==null){
                         ShoppingTrolley newShoppingTrolley = new ShoppingTrolley();
                         newShoppingTrolley.setItem_id(itemId);
